@@ -92,3 +92,9 @@ lrwxrwxrwx 1 root root  10 Mai  1 17:53 40ae4c8f-77f9-4ce5-b2ce-3c00a930af59 -> 
 
 // --------------------------
 
+nofail etc
+
+nobootwait
+nofail
+
+source: https://www.raspberrypi.org/forums/viewtopic.php?t=207711
