@@ -1,27 +1,28 @@
 # Packages
 
-## nvm
+## ~~nvm~~
 
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+Does not work due to non interactive shell used by remote-code.
+Use standard node installation instead. 
+
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 
 reopen terminal
 
-nvm install --lts
+    nvm install --lts
 
-## ~~Node~~
+## Node
 
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-## yarn
-
-npm i -g yarn
+    curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+    sudo apt-get install -y nodejs
 
 ## pm2
 
-npm i -g pm2
+    npm i -g pm2
 
-## mosquitto
+## ~~mosquitto~~ 
+
+not needed anymore
 
 source: https://www.modius-techblog.de/smart-home/mqtt-broker-auf-dem-raspberry-pi/
 
