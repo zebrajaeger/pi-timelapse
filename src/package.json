@@ -1,0 +1,22 @@
+{
+  "name": "drivelist-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node task-timelapse.js",
+    "start2": "node index.js"
+  },
+  "author": "Lars Brandt",
+  "license": "ISC",
+  "dependencies": {
+    "dateformat": "^3.0.3",
+    "drivelist": "^8.0.10",
+    "log4js": "^6.2.1",
+    "onoff": "^6.0.0",
+    "rimraf": "^3.0.2",
+    "usb-detection": "^4.9.0"
+  },
+  "devDependencies": {
+  }
+}

@@ -15,12 +15,17 @@ copy public key as new line in ~/.ssh/authorized_keys
 echo "# Custom aliases" >> ~/.bashrc
 echo "alias l='ls -aldh --color=auto'" >> ~/.bashrc
 echo "alias ll='ls -ald --color=auto'" >> ~/.bashrc
+echo "alias d='du -hs .[^.]* | sort -hr'" >> ~/.bashrc
+
+source ~/.bashrc
 
 ## mc
 
 sudo apt install mc
 
 ## samba
+
+source: https://www.elektronik-kompendium.de/sites/raspberry-pi/2007071.htm
 
 sudo apt-get install samba
 
