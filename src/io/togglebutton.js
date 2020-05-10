@@ -41,7 +41,7 @@ module.exports = class ToggleButton {
         this.offCallback = callback;
     }
 
-    onOff(callback) {
+    onToggle(callback) {
         this.toggleCallback = callback;
     }
 

@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "remote-code pi@192.168.178.67 --verbose --identity-file id_rsa --target /tmp/abc --source ../src"
+    "start": "remote-code pi@192.168.178.67 --verbose --identity-file id_rsa --target /tmp/abc --source ../src",
+    "deploy": "rsync -v -azd --rsh=\"ssh -i id_rsa -p 22\" --delete --exclude=.git/ ../src/ pi@192.168.178.67:/home/pi/picam",
+    "reboot": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"sudo reboot\""
   },
   "author": "",
   "license": "ISC",

@@ -3,9 +3,11 @@ const LOG = require('./log').getLogger('Main');
 const {Worker} = require('worker_threads');
 
 const fsUtils = require('./fsutils');
+const system = require('./system');
 const mount = require('./mount');
 const Led = require('./io/led');
 const ToggleButton = require('./io/togglebutton');
+const ResetButton = require('./io/resetbutton');
 const Power = require('./io/power');
 
 const params = {
@@ -17,7 +19,8 @@ const params = {
 let worker = null;
 let led = new Led(21);
 let power = new Power(26, 1);
-let button = new ToggleButton(20, 0);
+let captureButton = new ToggleButton(20, 0);
+let resetButton = new ResetButton(16, 5000);
 
 let isHddMounted = mount.isMounted(params.hddPath);
 let isCapturing = false;
@@ -48,12 +51,12 @@ async function startRaspistillTask() {
     await fsUtils.sudoClearTempFromJpg(params.tempPath);
     LOG.info(`Clean temp dir done`);
 
-    let workerData = {pathTemp: params.tempPath, pathTarget: params.hddPath, timeS: 10};
+    let workerData = {pathTemp: params.tempPath, pathTarget: params.hddPath, timeS: params.runtimeS};
     const worker = new Worker('./task-timelapse.js', {workerData});
     worker.on('exit', (code) => {
         isCapturing = false;
         button.setState(0);
-        led.setTime(1000, 0);
+        led.setTime(1500, 100);
         const msg = `Move Task stopped with exit code ${code}`;
         if (code !== 0) {
             LOG.error(msg);
@@ -83,7 +86,7 @@ async function checkMount() {
     if (isHddMounted !== oldState) {
         if (isHddMounted) {
             LOG.info(`HDD plugged in @${params.hddPath}`);
-            led.setTime(1000, 0);
+            led.setTime(2000, 50);
         } else {
             // plugged off
             LOG.info(`HDD plugged out @${params.hddPath}`);
@@ -98,8 +101,8 @@ async function checkMount() {
 (async () => await checkMount())();
 setInterval(() => checkMount(), 10000);
 
-led.setTime(100, 1500);
-button.onOn(() => {
+led.setTime(50, 2000);
+captureButton.onOn(() => {
     // no mount no fun
     if (!isHddMounted) {
         LOG.info(`ToggleButton: HDD not plugged in @${params.hddPath}, so no action will occur`);
@@ -112,8 +115,12 @@ button.onOn(() => {
     })();
 });
 
-button.onOff(() => {
+captureButton.onOff(() => {
     // stop
     LOG.info(`Stop capturing`);
     (async () => await stopRaspistillTask())();
 });
+
+resetButton.onReset(() => {
+    system.shutdown();
+})
