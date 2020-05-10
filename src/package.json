@@ -8,7 +8,7 @@
     "start2": "node index.js"
   },
   "author": "Lars Brandt",
-  "license": "ISC",
+  "license": "LGPL-3.0-or-later",
   "dependencies": {
     "dateformat": "^3.0.3",
     "drivelist": "^8.0.10",
