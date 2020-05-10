@@ -18,7 +18,7 @@ const {exec} = require('child_process');
 // generic
 function execCmd(cmd) {
     return new Promise((resolve, reject) => {
-        LOG.info(cmd);
+        LOG.debug(cmd);
         exec(cmd, (err, stdout, stderr) => {
             if (err) {
                 LOG.error(`cmd error: '${stderr}'`);
@@ -26,7 +26,7 @@ function execCmd(cmd) {
             } else {
                 if(stdout){
                     // output only if output available
-                    LOG.info(`cmd ok: '${stdout}'`);
+                    LOG.debug(`cmd ok: '${stdout}'`);
                 }
                 resolve(stdout);
             }
