@@ -1,2 +1,5 @@
 # pi-timelapse
-How to make timelapse videos with raspberry pi
+
+Timelapse JPG capture with raspberry pi and Raspberry Pi camera
+
+Hardware/Schematic: https://easyeda.com/zebrajaeger/pi-timelapse
