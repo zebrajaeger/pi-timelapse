@@ -13,6 +13,9 @@ You should have received a copy of the GNU General Public License along with Foo
 const LOG = require('./log').getLogger('Main');
 
 const {Worker} = require('worker_threads');
+const {program} = require('commander');
+
+const pkg = require('./package.json');
 
 const fsUtils = require('./fsutils');
 const system = require('./system');
@@ -22,12 +25,23 @@ const ToggleButton = require('./io/togglebutton');
 const ResetButton = require('./io/resetbutton');
 const Power = require('./io/power');
 
+// parse commandline
+program.version = pkg['version'];
+program
+    .option('-t, --temp-path <path>', 'path of temporary image location', '/var/cam')
+    .option('-o, --output-path <path>', 'path of permanent image location(target)', '/media/usb0')
+    .option('-r, --runtime <seconds>', 'runtime in seconds', (3600*24).toString())
+program.parse(process.argv);
+
 const params = {
-    tempPath: '/var/cam',
-    hddPath: '/mnt/hdd',
-    runtimeS: 3600 * 24
+    tempPath: program.opts()['temp-path'],
+    hddPath: program.opts()['output-path'],
+    runtimeS: parseInt(program.opts()['runtime'])
 };
 
+LOG.info(JSON.stringify(params,null,4))
+
+// initialize globals
 let worker = null;
 let led = new Led(21);
 let power = new Power(26, 1);
@@ -37,6 +51,7 @@ let resetButton = new ResetButton(16, 5000);
 let isHddMounted = mount.isMounted(params.hddPath);
 let isCapturing = false;
 
+// program
 async function startRaspistillTask() {
     LOG.info(`Start capture task`);
     // check that HDD is mounted
