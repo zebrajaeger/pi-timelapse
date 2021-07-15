@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+    <title>Raspberry Pi - Camera Stream</title>
+    <style>
+        body {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #111;
+        }
+
+        .video-stream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            width: calc(100% + 2px);
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+<img class="video-stream" src="stream.mjpg" alt="video stream">
+</body>
+</html>

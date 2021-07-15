@@ -12,9 +12,11 @@
   "dependencies": {
     "commander": "^8.0.0",
     "dateformat": "^3.0.3",
+    "express": "^4.17.1",
     "drivelist": "^8.0.10",
     "log4js": "^6.2.1",
     "onoff": "^6.0.0",
+    "raspberry-pi-camera-native": "^0.0.0",
     "rimraf": "^3.0.2",
     "usb-detection": "^4.9.0"
   }

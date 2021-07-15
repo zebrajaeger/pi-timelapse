@@ -24,22 +24,28 @@ const Led = require('./io/led');
 const ToggleButton = require('./io/togglebutton');
 const ResetButton = require('./io/resetbutton');
 const Power = require('./io/power');
+const VideostreamServer = require('./videostream-server');
 
 // parse commandline
 program.version = pkg['version'];
 program
     .option('-t, --temp-path <path>', 'path of temporary image location', '/var/cam')
     .option('-o, --output-path <path>', 'path of permanent image location(target)', '/media/usb0')
+    .option('-p, --output-prefix <seconds>', 'permanent path prefix', 'timelapse_')
     .option('-r, --runtime <seconds>', 'runtime in seconds', (3600*24).toString())
 program.parse(process.argv);
 
 const params = {
-    tempPath: program.opts()['temp-path'],
-    hddPath: program.opts()['output-path'],
+    tempPath: program.opts()['tempPath'],
+    targetPrefix: program.opts()['outputPrefix'],
+    hddPath: program.opts()['outputPath'],
     runtimeS: parseInt(program.opts()['runtime'])
 };
 
 LOG.info(JSON.stringify(params,null,4))
+
+// start server
+// VideostreamServer.start();
 
 // initialize globals
 let worker = null;
@@ -78,13 +84,18 @@ async function startRaspistillTask() {
     await fsUtils.sudoClearTempFromJpg(params.tempPath);
     LOG.info(`Clean temp dir done`);
 
-    let workerData = {pathTemp: params.tempPath, pathTarget: params.hddPath, timeS: params.runtimeS};
+    let workerData = {
+        pathTemp: params.tempPath,
+        pathTarget: params.hddPath,
+        targetPrefix: params.targetPrefix,
+        timeS: params.runtimeS
+    };
     const worker = new Worker('./task-timelapse.js', {workerData});
     worker.on('exit', (code) => {
         isCapturing = false;
-        button.setState(0);
+        captureButton.setState(0);
         led.setTime(1500, 100);
-        const msg = `Move Task stopped with exit code ${code}`;
+        const msg = `Timelapse-Task stopped with code: ${code}`;
         if (code !== 0) {
             LOG.error(msg);
         } else {
@@ -118,12 +129,11 @@ async function checkMount() {
             // plugged off
             LOG.info(`HDD plugged out @${params.hddPath}`);
             led.setTime(100, 1500);
-            button.setState(0);
+            captureButton.setState(0);
             await stopRaspistillTask();
         }
     }
 }
-
 
 (async () => await checkMount())();
 setInterval(() => checkMount(), 10000);

@@ -18,7 +18,6 @@ const {spawn} = require('child_process');
 module.exports = (pathTo, timeS, msgCallbackOut, msgCallbackErr) => {
 
     return new Promise((resolve, reject) => {
-
         const targetPath = path.resolve(pathTo, 'img-%08d.jpg');
 
         const cmd = 'sudo';
@@ -48,7 +47,7 @@ module.exports = (pathTo, timeS, msgCallbackOut, msgCallbackErr) => {
             if (code === 0) {
                 resolve();
             } else {
-                reject(code);
+                reject('start raspistill failed with code ' + code);
             }
         });
     })

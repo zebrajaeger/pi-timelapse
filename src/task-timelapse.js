@@ -19,7 +19,7 @@ const dateFormat = require('dateformat');
 
 const raspistill = require('./raspistill');
 
-const {pathTemp, pathTarget, timeS} = workerData;
+const {pathTemp, pathTarget, targetPrefix, timeS} = workerData;
 
 function startMoveTask(from, to) {
     let workerData = {pathFrom: from, pathTo: to};
@@ -35,10 +35,10 @@ function startMoveTask(from, to) {
     return worker;
 }
 
-(async () => {
+async function main() {
     const config = {
         source: path.resolve(pathTemp),
-        dest: path.resolve(pathTarget, 'test_' + dateFormat(new Date(), 'yyyy-mm-dd_h:MM:ss'))
+        dest: path.resolve(pathTarget, targetPrefix + dateFormat(new Date(), 'yyyy-mm-dd_h:MM:ss'))
     };
     LOG.debug(config);
 
@@ -49,10 +49,16 @@ function startMoveTask(from, to) {
     const moveTask = startMoveTask(config.source, config.dest);
 
     // exec raspistill
-    await raspistill(config.source, timeS, out => LOG.d(out), err => LOG.w(err));
+    try {
+        await raspistill(config.source, timeS, out => LOG.debug(out), err => LOG.warn(err));
+    } catch (e) {
+        process.exit(-666);
+    }
 
-    // stop movetask
-    setTimeout(() => moveTask.terminate(), 5000);
-})();
+    // stop movetask after 1,5 seconds
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    await moveTask.terminate();
+}
 
+main().then();
 

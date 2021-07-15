@@ -23,34 +23,38 @@ LOG.info(workerData);
 
 const dest = pathTo;
 
-let canRun = true;
-let intervalCounter = 0;
+// async function moveFile(filePath) {
+//     LOG.info(`Move file '${filePath}'`);
+//     await fsUtils.sudoChownFile(filePath, 'pi', 'pi');
+//     await fsUtils.mv(filePath, dest);
+// }
 
-parentPort.on('message', msg => {
-    if(msg==='stop'){
-        canRun = false;
-    }
-});
-
-function moveFiles() {
-    fs.readdirSync(pathFrom).forEach(f => {
-        if (f.toLowerCase().endsWith('.jpg')) {
-            let fullPath = path.resolve(pathFrom, f);
-            LOG.info(`Process file '${fullPath}'`);
-            (async () => {
-                await fsUtils.sudoChownFiles(fullPath, 'pi', 'pi');
-                await fsUtils.mv(fullPath, dest);
-            })();
-        }
-    });
+async function processFiles(filePathArray) {
+    LOG.info(`Move files '${filePathArray}'`);
+    await fsUtils.sudoChownFiles(filePathArray, 'pi', 'pi');
+    await fsUtils.mvs(filePathArray, dest);
 }
 
-let handle = setInterval(() => {
-    if(!canRun){
-        clearInterval(handle);
+async function moveFiles() {
+    LOG.debug('moveFiles()')
+    const allFiles = fs.readdirSync(pathFrom);
+
+    const toProcess = [];
+    for (let f of allFiles) {
+        if (f.toLowerCase().endsWith('.jpg')) {
+            toProcess.push(path.resolve(pathFrom, f));
+            //await moveFile(path.resolve(pathFrom, f));
+        }
     }
-    if(intervalCounter++ >=10 ){
-        intervalCounter = 0;
-        moveFiles()
+    if (toProcess.length > 0) {
+        await processFiles(toProcess);
     }
-}, 100);
+}
+
+async function startInterval() {
+    await moveFiles();
+    setTimeout(startInterval, 1000);
+}
+
+LOG.debug('START MoveTask')
+startInterval().then();

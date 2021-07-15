@@ -15,6 +15,14 @@ const LOG = require('./log').getLogger('fsutils');
 const path = require('path');
 const {exec} = require('child_process');
 
+function joinFileArguments(fileArray) {
+    const temp = [];
+    for (let f of fileArray) {
+        temp.push('\'' + f + '\'');
+    }
+    return temp.join(' ');
+}
+
 // generic
 function execCmd(cmd) {
     return new Promise((resolve, reject) => {
@@ -24,7 +32,7 @@ function execCmd(cmd) {
                 LOG.error(`cmd error: '${stderr}'`);
                 reject(stderr);
             } else {
-                if(stdout){
+                if (stdout) {
                     // output only if output available
                     LOG.debug(`cmd ok: '${stdout}'`);
                 }
@@ -35,8 +43,12 @@ function execCmd(cmd) {
 }
 
 // sudo stuff
-function sudoChownFiles(p, user, group) {
+function sudoChownFile(p, user, group) {
     return execCmd(`sudo chown -f ${user}.${group} ${p}`);
+}
+
+function sudoChownFiles(fileArray, user, group) {
+    return execCmd(`sudo chown -f ${user}.${group} ${joinFileArguments(fileArray)}`);
 }
 
 function sudoRmFiles(p) {
@@ -48,14 +60,20 @@ function mv(from, to) {
     return execCmd(`mv ${from} ${to}`);
 }
 
+function mvs(fromList, to) {
+    return execCmd(`mv ${joinFileArguments(fromList)} ${to}`);
+}
+
 function sudoClearTempFromJpg(baseDir) {
     return sudoRmFiles(path.resolve(baseDir, '*.jpg')).then(() => sudoRmFiles(path.resolve(baseDir, '*.jpg~')));
 }
 
 module.exports = {
-    execCmd: execCmd,
-    sudoChownFiles: sudoChownFiles,
-    sudoRmFiles: sudoRmFiles,
-    mv: mv,
-    sudoClearTempFromJpg: sudoClearTempFromJpg
+    execCmd,
+    sudoChownFile,
+    sudoChownFiles,
+    sudoRmFiles,
+    mv,
+    mvs,
+    sudoClearTempFromJpg
 };
