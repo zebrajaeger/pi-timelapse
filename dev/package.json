@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "develop": "remote-code pi@pi4 --verbose --identity-file ~/.ssh/id_rsa.h --target /tmp/picam --source ../src --install-cmd 'yarn install' --start-cmd 'nodemon --trace-warnings --unhandled-rejections=strict .'",
-    "deploy": "rsync -v -azd --rsh=\"ssh -i id_rsa.h -p 22\" --delete --exclude=.git/ ../src/ pi@pi4:/home/pi/picam",
+    "deploy-home": "rsync -v -azd --rsh=\"ssh -i ~/.ssh/id_rsa.h -p 22\" --delete --exclude=.git/ --exclude=yarn-error.log --exclude=node_modules/ ../src/ pi@pi4:/home/pi/picam",
+    "deploy-tmp": "rsync -v -azd --rsh=\"ssh -i ~/.ssh/id_rsa.h -p 22\" --delete --exclude=.git/ --exclude=yarn-error.log --exclude=node_modules/ ../src/ pi@pi4:/tmp/picam",
     "reboot": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"sudo reboot\"",
     "pm2start": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"pm2 start /home/pi/picam/index.js --name picam\"",
     "pm2delete": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"pm2 picam\"",

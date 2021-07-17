@@ -6,6 +6,8 @@ const {performance} = require('perf_hooks');
 
 const {Codec, StreamCamera} = require("pi-camera-connect");
 
+const {Subject} = require('rxjs');
+
 const express = require('express')
 const app = express();
 
@@ -20,8 +22,6 @@ function getIPs() {
             if (!x.internal) {
                 x['name'] = key;
                 result.push(x);
-                //     const line = `${key}, ${x.family}: ${x.address}`
-                //     console.log(line)
             }
         }
     }
@@ -31,41 +31,7 @@ function getIPs() {
 
 const streamCamera = new StreamCamera({codec: Codec.MJPEG});
 
-class FrameValue {
-    _currentFrame;
-    subscribers;
-
-    constructor() {
-        this._currentFrame = undefined;
-        this.subscribers = [];
-    }
-
-    subscribe(subscriber, getCurrentValue) {
-        this.subscribers.push(subscriber);
-        if (getCurrentValue && this._currentFrame !== undefined) {
-            subscriber.onFrame(this._currentFrame);
-        }
-    }
-
-    unsubscribe(subscriber) {
-        this.subscribers = this.subscribers.filter(function (value, index, arr) {
-            return value !== subscriber;
-        });
-    }
-
-    next(frame) {
-        this._currentFrame = frame;
-        for (const s of this.subscribers) {
-            s.onFrame(frame);
-        }
-    }
-
-    get currentFrame() {
-        return this._currentFrame;
-    }
-}
-
-const frame = new FrameValue();
+const frameSubject = new Subject();
 
 async function init(port = 3000) {
     app.get('/stream.mjpg', (req, res) => {
@@ -77,19 +43,18 @@ async function init(port = 3000) {
         });
 
         let isReady = true;
-        req.onFrame = f => {
+        req.subscription = frameSubject.subscribe(frame => {
             if (isReady) {
                 isReady = false;
-                res.write(`--myboundary\nContent-Type: image/jpg\nContent-length: ${f.length}\n\n`);
-                res.write(f, function () {
+                res.write(`--myboundary\nContent-Type: image/jpg\nContent-length: ${frame.length}\n\n`);
+                res.write(frame, function () {
                     isReady = true;
                 });
             }
-        }
-        frame.subscribe(req, true);
+        });
 
         req.on('close', () => {
-            frame.unsubscribe(req);
+            req.subscription.unsubscribe();
             LOG.debug('Connection terminated: ' + req.hostname);
         });
 
@@ -120,14 +85,13 @@ async function capture() {
             const img = await streamCamera.takeImage()
             const t2 = performance.now()
             LOG.trace(`Capture image took ${(t2 - t1).toFixed(1)} ms`);
-            frame.next(img);
+            frameSubject.next(img);
             await capture_();
         }, 10)
     }
 
     return capture_();
 }
-
 
 async function start() {
     if (running) {
