@@ -79,6 +79,13 @@ check it
     pi@pi4:~ $ mount | grep cam
     tmpfs on /var/cam type tmpfs (rw,nosuid,nodev,relatime,size=204800k)
 
+## Pitfalls
+
+### File system of the external USB-Drive
+
+Never ever use ntfs formatted usb-hdds with this software. 
+The write-performance is in my case < 2Mb/s and way to slow.
+The same HDD, formatted in ext4 works very well. 
 
 ## Develop
 
@@ -86,3 +93,21 @@ Uses rsync and seems to have trouble with cygwin.
 
     cd dev
     npm run develop
+
+## Better using eth instead of wifi (unstable)
+
+Configure 
+- wifi with dhcp 
+- eth0 with dhcp and a static ip as fallback (direct connection to developer pc)
+
+
+    sudo nano /etc/dhcpcd.conf
+
+add
+
+    profile static_eth0
+    static ip_address=10.1.2.55/24
+    interface eth0
+    fallback static_eth0
+
+the reboot
