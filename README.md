@@ -79,6 +79,21 @@ check it
     pi@pi4:~ $ mount | grep cam
     tmpfs on /var/cam type tmpfs (rw,nosuid,nodev,relatime,size=204800k)
 
+## Installation
+
+### Get code
+    cd ~
+    git clone https://github.com/zebrajaeger/pi-timelapse.git
+
+### Autostart
+
+    crontab -e
+
+add
+
+    @reboot npm --prefix /home/pi/pi-timelapse/src run start
+
+
 ## Pitfalls
 
 ### File system of the external USB-Drive
