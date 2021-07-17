@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node task-timelapse.js",
-    "start2": "node index.js"
+    "start": "node index.js",
+    "develop": "nodemon ."
   },
   "author": "Lars Brandt",
   "license": "LGPL-3.0-or-later",
