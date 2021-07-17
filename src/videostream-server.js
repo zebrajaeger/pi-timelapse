@@ -1,5 +1,3 @@
-// a modified version of https://github.com/caseymcj/raspberrypi_node_camera_web_streamer/blob/master/index.js
-
 const LOG = require('./log').getLogger('Server');
 const os = require('os');
 const {performance} = require('perf_hooks');
