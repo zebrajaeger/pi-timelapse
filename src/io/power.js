@@ -15,7 +15,6 @@ const Gpio = require('onoff').Gpio;
 module.exports = class Power {
     constructor(gpioPin, enabled) {
         this.gpio = new Gpio(gpioPin, 'out');
-        this.set(enabled);
     }
 
     set(enabled) {

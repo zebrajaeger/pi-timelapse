@@ -2,3 +2,5 @@
 **/id_rsa
 *.iml
 .idea
+**/yarn-error.log
+**/application.log

@@ -12,14 +12,19 @@ You should have received a copy of the GNU General Public License along with Foo
 
 const log4js = require('log4js');
 
+console.log("\x1b[0m"); // reset
+
 log4js.configure({
     appenders: {
-        out: { type: 'stdout' },
-        app: { type: 'file', filename: 'application.log' }
+        out: {type: 'stdout'},
+        app: {type: 'file', filename: 'application.log'}
     },
     categories: {
-        default: { appenders: [ 'out', 'app' ], level: 'debug' }
-    }
+        default: {appenders: ['out', 'app'], level: 'debug'}
+    },
+    // levels: {
+    //     INFO: { value: 20000, colour: 'white' }
+    // }
 });
 
 module.exports = log4js;

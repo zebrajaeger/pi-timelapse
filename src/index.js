@@ -25,6 +25,10 @@ const ToggleButton = require('./io/togglebutton');
 const ResetButton = require('./io/resetbutton');
 const Power = require('./io/power');
 const VideostreamServer = require('./videostream-server');
+const SegfaultHandler = require('@buckyos/segfault-handler');
+
+// add crash handler
+SegfaultHandler.registerHandler("crash.log");
 
 // parse commandline
 program.version = pkg['version'];
@@ -32,7 +36,7 @@ program
     .option('-t, --temp-path <path>', 'path of temporary image location', '/var/cam')
     .option('-o, --output-path <path>', 'path of permanent image location(target)', '/media/usb0')
     .option('-p, --output-prefix <seconds>', 'permanent path prefix', 'timelapse_')
-    .option('-r, --runtime <seconds>', 'runtime in seconds', (3600*24).toString())
+    .option('-r, --runtime <seconds>', 'runtime in seconds', (3600 * 24).toString())
 program.parse(process.argv);
 
 const params = {
@@ -42,18 +46,24 @@ const params = {
     runtimeS: parseInt(program.opts()['runtime'])
 };
 
-LOG.info(JSON.stringify(params,null,4))
+LOG.info(JSON.stringify(params, null, 4))
 
 // start server
-// VideostreamServer.start();
+LOG.info('Start videoserver...')
+VideostreamServer
+    .init()
+    .then(() => VideostreamServer.start())
+    .then(()=>LOG.info('Start videoserver...done'));
+
+// Hardware (Buttons, LED)
+const power = new Power(26, 1);
+power.setOn();
+const captureButton = new ToggleButton(20, 0);
+const resetButton = new ResetButton(16, 5000);
+const led = new Led(21);
 
 // initialize globals
 let worker = null;
-let led = new Led(21);
-let power = new Power(26, 1);
-let captureButton = new ToggleButton(20, 0);
-let resetButton = new ResetButton(16, 5000);
-
 let isHddMounted = mount.isMounted(params.hddPath);
 let isCapturing = false;
 
@@ -84,6 +94,8 @@ async function startRaspistillTask() {
     await fsUtils.sudoClearTempFromJpg(params.tempPath);
     LOG.info(`Clean temp dir done`);
 
+    await VideostreamServer.stop();
+
     let workerData = {
         pathTemp: params.tempPath,
         pathTarget: params.hddPath,
@@ -91,7 +103,7 @@ async function startRaspistillTask() {
         timeS: params.runtimeS
     };
     const worker = new Worker('./task-timelapse.js', {workerData});
-    worker.on('exit', (code) => {
+    worker.on('exit', async (code) => {
         isCapturing = false;
         captureButton.setState(0);
         led.setTime(1500, 100);
@@ -101,6 +113,9 @@ async function startRaspistillTask() {
         } else {
             LOG.info(msg);
         }
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await VideostreamServer.start();
     });
     return worker;
 }
@@ -159,5 +174,5 @@ captureButton.onOff(() => {
 });
 
 resetButton.onReset(() => {
-    system.shutdown();
+    return system.shutdown();
 })

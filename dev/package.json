@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "develop": "remote-code pi@pi4 --verbose --identity-file ~/.ssh/id_rsa.h --target /tmp/picam --source ../src --start-cmd 'nodemon --trace-warnings --unhandled-rejections=strict .'",
+    "develop": "remote-code pi@pi4 --verbose --identity-file ~/.ssh/id_rsa.h --target /tmp/picam --source ../src --install-cmd 'yarn install' --start-cmd 'nodemon --trace-warnings --unhandled-rejections=strict .'",
     "deploy": "rsync -v -azd --rsh=\"ssh -i id_rsa.h -p 22\" --delete --exclude=.git/ ../src/ pi@pi4:/home/pi/picam",
     "reboot": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"sudo reboot\"",
     "pm2start": "ssh -i id_rsa -p 22 pi@192.168.178.67 \"pm2 start /home/pi/picam/index.js --name picam\"",
