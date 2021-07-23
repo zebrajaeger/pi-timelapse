@@ -43,7 +43,6 @@ async function moveFiles() {
     for (let f of allFiles) {
         if (f.toLowerCase().endsWith('.jpg')) {
             toProcess.push(path.resolve(pathFrom, f));
-            //await moveFile(path.resolve(pathFrom, f));
         }
     }
     if (toProcess.length > 0) {
@@ -52,7 +51,12 @@ async function moveFiles() {
 }
 
 async function startInterval() {
-    await moveFiles();
+    try {
+        await moveFiles();
+    } catch (e) {
+        LOG.error('Failed to move Files', e);
+    }
+
     setTimeout(startInterval, 1000);
 }
 
