@@ -38,7 +38,7 @@ function startMoveTask(from, to) {
 async function main() {
     const config = {
         source: path.resolve(pathTemp),
-        dest: path.resolve(pathTarget, targetPrefix + dateFormat(new Date(), 'yyyy-mm-dd_h:MM:ss'))
+        dest: path.resolve(pathTarget, targetPrefix + dateFormat(new Date(), 'yyyy-mm-dd_hMMss'))
     };
     LOG.debug(config);
 
