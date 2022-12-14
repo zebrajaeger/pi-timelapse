@@ -14,7 +14,7 @@
     "commander": "^8.0.0",
     "dateformat": "^3.0.3",
     "drivelist": "^8.0.10",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "log4js": "^6.2.1",
     "onoff": "^6.0.0",
     "pi-camera-connect": "^0.3.4",
